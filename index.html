@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Worst London Underground Line</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<header>
+    <h2>LONDON UNDERGROUND</h1>    
+</header>
+<body>
+    <div class="containter">
+        <h1>What's your favourite line?</h1>
+        <p>This is a live counter of London's most loved/hated tube line.</p>
+        <p>Click a line below to submit your vote.</p>
+        <img class="contentArrow" src="downArrow.svg" alt="down arrow">
+    </div>
+
+    
+    <div id="bakerloo" class="shape bakerloo">0 votes</div>
+    <div id="central" class="shape central">0 votes</div>
+    <div id="circle" class="shape circle">0 votes</div>
+    <div id="district" class="shape district">0 votes</div>
+    <div id="dlr" class="shape dlr">0 votes</div>
+    <div id="hammersmith" class="shape hammersmith">0 votes</div>
+    <div id="jubilee" class="shape jubilee">0 votes</div>
+    <div id="metropolitan" class="shape metropolitan">0 votes</div>
+    <div id="northern" class="shape northern">0 votes</div>
+    <div id="overground" class="shape overground">0 votes</div>
+    <div id="picadilly" class="shape picadilly">0 votes</div>
+    <div id="waterloo" class="shape waterloo">0 votes</div>
+
+
+    <div class="containter">
+        <p id="totalVotesCounter"></p>
+        <p id="londonVotesCounter">Votes so far from Londoners: 20</p>
+        <button id="enableLocation">Enable Location</button>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/5.10.0/firebase.js"></script>
+
+    <!-- main.js -->
+    <script src="./main.js"></script>
+    <script>
+        // Initialize Firebase
+        // var config = {
+        // apiKey: "AIzaSyAU7yRc07l1fAtIQskR-TUFrQHmCMgTpcg",
+        // authDomain: "tflvoting.firebaseapp.com",
+        // databaseURL: "https://tflvoting.firebaseio.com",
+        // projectId: "tflvoting",
+        // storageBucket: "tflvoting.appspot.com",
+        // messagingSenderId: "102485799417"
+        // };
+
+        // firebase.initializeApp(config);
+
+    </script>
+    
+    <!-- main.js -->
+    <script>
+        let totalVotes = 0
+        let totalVotesCounter = document.getElementById('totalVotesCounter')
+        let numVotes = +totalVotesCounter.textContent
+        totalVotesCounter.innerHTML = `Votes so far: <b>${numVotes}</b>`
+        
+        
+        // let box = document.getElementById('myBox')
+        // box.addEventListener('click', (event) => {
+        //     let val = +box.textContent
+        //     val ++
+        //     box.textContent = val
+            
+            
+        //     let boxWidth = box.style
+        //     newWidth += 2
+        //     boxWidth.width = `${newWidth}px`
+        //     console.log(`${newWidth}px`)
+        // })
+        let linesData = {
+            metropolitan: 0,
+            picadilly: 0,
+            circle: 0,
+            hammersmith: 0,
+            district: 0
+        }
+
+        // Firebase: WRITE
+        // firebase.database().ref().set({
+        //     metropolitan: 0,
+        //     picadilly: 0,
+        //     circle: 0,
+        //     hammersmith: 0,
+        //     district: 0
+        // })
+        // let lineName = "circle"
+        // let newVotes = 200
+        // let dataToUpdate = { [lineName] : newVotes }
+        // firebase.database().ref().update(dataToUpdate)
+
+        // Firebase: READ
+        let firebaseData = undefined
+        firebase.database().ref().on('value', function(snapshot) {
+            firebaseData = snapshot.val()
+            // this is async, so all dependent funcs need to be run in .then()
+        })
+
+        // Voting events
+        let boxes = document.getElementsByClassName('shape')
+        for (let i = 0; i < boxes.length; i ++) {
+            let newWidth = 60
+            boxes[i].addEventListener('mouseover', (event) => {
+                linesData[boxes[i].id] ++
+                
+                // WRITE increment Firebase values by +1
+                let lineName = boxes[i].id
+                let newVotes = firebaseData[lineName]
+                newVotes ++
+                let dataToUpdate = { [lineName] : newVotes }
+                firebase.database().ref().update(dataToUpdate)
+                boxes[i].innerHTML = `${firebaseData[lineName]} votes` // `${linesData[boxes[i].id]} votes`
+
+                // READ set bar width to new Firbase data
+                let boxWidth = boxes[i].style
+                newWidth += 40 // amount of width increase upon each new vote
+                boxWidth.width = `${newWidth}px`
+
+                // Vote count
+                numVotes ++ 
+                totalVotesCounter.innerHTML = `Votes so far: <b>${numVotes}</b>`
+            })
+        }
+
+        // get user location
+        const enableLocation = document.getElementById('enableLocation')
+        enableLocation.addEventListener('click', function(event) {
+                    
+            navigator.geolocation.getCurrentPosition((position) => {
+                let lat = position.coords.latitude
+                let lon = position.coords.longitude
+                console.log(lat, lon)
+            }, error => console.log(error))
+            
+        })
+    </script>
+    
+</body>
+<footer>
+    <p>Imagined by <b><a href="https://twitter.com/JackMerlinBruce" target="_blank">@JackMerlinBruce</a></b></p>
+</footer>
+</html>
