@@ -41,6 +41,12 @@ h1 {
     z-index: 1;
     transition: 0.075s ease;
 }
+.shape:active {
+    /* outline: 4px solid black; */
+    /* border-radius: 5px; */
+    box-shadow: 0 0 0px 10px #FFD300;
+    z-index: 1;
+}
 .shape.metropolitan {
     background-color: #9B0056;
 }
